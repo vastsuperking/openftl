@@ -10,8 +10,7 @@ void renderScene() {
 	swapBuffers();
 }
 int main() {
-	printf("Hello world\n");
-	initDisplay(500, 500, "Test");
+	initDisplay(500, 500, "OpenFTL");
 	
 	setRenderFunction(renderScene);
 

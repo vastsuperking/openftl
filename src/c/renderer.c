@@ -1,7 +1,10 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <GL/glut.h>
+#include <GL/freeglut.h>
 #include <stdio.h>
+
+#define MAJOR_CONTEXT_VERSION 2
+#define MINOR_CONTEXT_VERSION 0
 
 void initDisplay(int width, int height, char *name) {
 	int argc = 1;
@@ -9,7 +12,10 @@ void initDisplay(int width, int height, char *name) {
 
 	myargv[0] = name;
 	glutInit(&argc, myargv);
+
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
+	glutInitContextVersion(MAJOR_CONTEXT_VERSION, MINOR_CONTEXT_VERSION);
+
 	glutInitWindowPosition(100, 100);
 	glutInitWindowSize(width, height);
 	glutCreateWindow(name);
