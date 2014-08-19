@@ -14,3 +14,4 @@ openftl: $(OBJECTS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 clean:
 	rm -f *.o 
+	rm -f openftl
