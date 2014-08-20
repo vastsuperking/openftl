@@ -16,8 +16,7 @@ readFileContents(const char* filename) {
 	if(size == -1) return (NULL);
 	if(fseek(input, 0, SEEK_SET) == -1) return (NULL);
  
-	/*if using c-compiler: dont cast malloc's return value*/
-	content = (char*) malloc( (size_t) size +1  ); 
+	content = (char*) malloc((size_t) size +1  ); 
 	if(content == NULL) return (NULL);
  
 	fread(content, 1, (size_t)size, input);
@@ -106,9 +105,8 @@ deleteShader(shader_t *shader) {
 	glDeleteShader(s.handle);
 	free(shader);
 }
-void deleteProgram(program_t *program) {
-	deleteShader(program->vertexShader);
-	deleteShader(program->fragmentShader);
+void
+deleteProgram(program_t *program) {
 	glDeleteProgram(program->handle);
 	free(program);
 }

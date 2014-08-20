@@ -6,5 +6,6 @@ shader_t   *createShader(GLenum shaderType, const GLchar *source);
 shader_t   *createShaderFromFile(GLenum shaderType, const char *filename);
 program_t  *createProgram(shader_t *vertexShader, shader_t *fragmentShader);
 void		deleteShader(shader_t *shader);
+void		deleteProgram(program_t *program);
 
 #endif

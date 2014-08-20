@@ -6,14 +6,13 @@
 #include "shader_struct.h"
 #include "shader.h"
 
-#define MAJOR_CONTEXT_VERSION 2
-#define MINOR_CONTEXT_VERSION 0
 
 shader_t *fragShader;
 shader_t *vertexShader;
 program_t *program;
 
-void initDisplay(int width, int height, char *name) {
+void
+initDisplay(int width, int height, char *name) {
 	int argc = 1;
 	int loadTest;
 	char *myargv[1];
@@ -22,7 +21,7 @@ void initDisplay(int width, int height, char *name) {
 	glutInit(&argc, myargv);
 
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
-	glutInitContextVersion(MAJOR_CONTEXT_VERSION, MINOR_CONTEXT_VERSION);
+	//glutInitContextVersion(MAJOR_CONTEXT_VERSION, MINOR_CONTEXT_VERSION);
 
 	glutInitWindowPosition(100, 100);
 	glutInitWindowSize(width, height);
@@ -31,26 +30,41 @@ void initDisplay(int width, int height, char *name) {
 	loadTest = ogl_LoadFunctions();
 	if (loadTest == ogl_LOAD_FAILED) printf("Loading opengl function pointers failed!");
 }
-void initOGL() {
+
+void
+initOGL() {
 	fragShader = createShaderFromFile(GL_FRAGMENT_SHADER, "fragment.frag");
 	vertexShader = createShaderFromFile(GL_VERTEX_SHADER, "vertex.vert");
-	program= createProgram(fragShader, vertexShader);
+	program = createProgram(fragShader, vertexShader);
 }
-void setRenderFunction(void (*func)(void)) {
+
+void
+destoryOGL() {
+	deleteShader(fragShader);
+	deleteShader(vertexShader);
+	deleteProgram(program);
+}
+
+void
+setRenderFunction(void (*func)(void)) {
 	glutDisplayFunc(func);
 }
 
-void startMainLoop() {
+void
+startMainLoop() {
 	glutMainLoop();
 }
 
-void clearDisplay() {
+void
+clearDisplay() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
-void swapBuffers() {
+
+void
+swapBuffers() {
 	glutSwapBuffers();
 }
 
-
-void renderQuad(float x, float y, int width, int height) {
+void
+renderQuad(float x, float y, int width, int height) {
 }
