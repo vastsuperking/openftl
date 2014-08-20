@@ -1,12 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <GL/gl.h>
+#include <glload/gl_2_0.h>
 #include "shader_struct.h"
 
-#define MAX_LINES 300
-#define LINE_SIZE
-
-char*
+char *
 readFileContents(const char* filename) {
 	FILE *input = fopen(filename, "rb");
 	long size;
@@ -34,12 +31,12 @@ readFileContents(const char* filename) {
 	return (content);
 }
 
-char*
+char *
 getTypeString(GLenum shaderType) {
 	char *strShaderType = NULL;
 	switch(shaderType) {
 	case GL_VERTEX_SHADER: strShaderType = "vertex"; break;
-	case GL_GEOMETRY_SHADER: strShaderType = "geometry"; break;
+//	case GL_GEOMETRY_SHADER: strShaderType = "geometry"; break;
 	case GL_FRAGMENT_SHADER: strShaderType = "fragment"; break;
 	}
 	return (strShaderType);
@@ -63,17 +60,38 @@ createShader(GLenum shaderType, const GLchar *source) {
 	glGetShaderiv(handle, GL_COMPILE_STATUS, &status);
 
 	if (status == GL_FALSE) {
-		printf("Unable to compile shader!");
-		glGetShadferiv(handle, GL_INFO_LOG_LENGTH, &infoLogLength);
+		printf("Unable to compile shader!\n");
+		glGetShaderiv(handle, GL_INFO_LOG_LENGTH, &infoLogLength);
 
 		infoLog = malloc(sizeof(GLchar) * (infoLogLength + 1));
 		glGetShaderInfoLog(handle, infoLogLength, NULL, infoLog);
-		printf("Error in %s: %s", getTypeString(shaderType), infoLog);
+		printf("Error in %s shader: %s\n", getTypeString(shaderType), infoLog);
 		free(infoLog);
 	}
 
 	shader = malloc(sizeof(shader_t));
+	(*shader).handle = handle;
+	(*shader).shaderType = shaderType;
 	return (shader);
+}
+program_t *
+createProgram(shader_t *vs, shader_t *fs) {
+	program_t *program;
+	GLuint programID;
+
+	programID = glCreateProgram();
+	
+	glAttachShader(programID, (*vs).handle);
+	glAttachShader(programID, (*fs).handle);
+
+	/* Link the program */
+	glLinkProgram(programID);
+	
+	program = malloc(sizeof(program_t));
+	(*program).handle = programID;
+	(*program).vertexShader = vs;
+	(*program).fragmentShader = fs;
+	return program;
 }
 
 shader_t *
@@ -84,7 +102,15 @@ createShaderFromFile(GLenum shaderType, const char *filename) {
 
 void
 deleteShader(shader_t *shader) {
+	shader_t s = *shader;
+	glDeleteShader(s.handle);
 	free(shader);
+}
+void deleteProgram(program_t *program) {
+	deleteShader(program->vertexShader);
+	deleteShader(program->fragmentShader);
+	glDeleteProgram(program->handle);
+	free(program);
 }
 
 
