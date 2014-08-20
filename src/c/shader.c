@@ -90,7 +90,7 @@ createProgram(shader_t *vs, shader_t *fs) {
 	(*program).handle = programID;
 	(*program).vertexShader = vs;
 	(*program).fragmentShader = fs;
-	return program;
+	return (program);
 }
 
 shader_t *
@@ -111,5 +111,27 @@ deleteProgram(program_t *program) {
 	free(program);
 }
 
+uniform_t *
+getUniform(program_t *program, const char *name) {
+	GLint handle;
+	uniform_t *uniform;
 
+	handle = glGetUniformLocation((*program).handle, name);
+	
+	uniform = malloc(sizeof(uniform_t));
+	(*uniform).location = handle;
+	(*uniform).name = name;
+	return (uniform);
+}
 
+attribute_t *
+getAttribute(program_t *program, const char *name) {
+	GLint handle;
+	attribute_t *attribute;
+	
+	handle = glGetAttribLocation((*program).handle, name);
+	attribute = malloc(sizeof(attribute_t));
+	(*attribute).location = handle;
+	(*attribute).name = name;
+	return (attribute);
+}

@@ -1,1 +1,3 @@
 src/resources/Data
+*.o
+src/c/openftl

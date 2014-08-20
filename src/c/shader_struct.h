@@ -16,4 +16,18 @@ struct program {
 
 typedef struct program program_t;
 
+struct attribute {
+	GLint location;
+	const char *name;
+};
+
+typedef struct attribute attribute_t;
+
+struct uniform {
+	GLint location;
+	const char *name;
+};
+
+typedef struct uniform uniform_t;
+
 #endif
