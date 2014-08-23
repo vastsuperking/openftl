@@ -1,21 +1,30 @@
+#include "renderer.h"
+
 #include <stdio.h>
 #include <glload/gl_2_0.h>
-#include "renderer.h"
-#include "shader_struct.h"
-#include "shader.h"
 
 
+void
+render_scene() {
+	clear_display();
+	
+	ready_for_rendering();
+	
+	set_color(1, 0, 0, 1);
 
-void renderScene() {
-	clearDisplay();
-	swapBuffers();
+	render_quad(-1, -1, 2, 2);
+	
+	finish_rendering();
+	swap_buffers();
 }
-int main() {
-	initDisplay(500, 500, "OpenFTL");
-	initOGL();
+int
+main() {
+	init_display(500, 500, "OpenFTL");
+	init_OGL();
+	set_render_function(render_scene);
 
-	setRenderFunction(renderScene);
+	start_main_loop();
 
-	startMainLoop();
+	destroy_OGL();
 	return 0;
 }

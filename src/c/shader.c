@@ -1,10 +1,28 @@
+#include "shader.h"
+
+#include <glload/gl_2_0.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <glload/gl_2_0.h>
-#include "shader_struct.h"
+#include <assert.h>
+
+static char *SHADER_TYPE_STRINGS[NUM_SHADER_TYPES] = {"vertex", "fragment"};
+static GLenum SHADER_TYPE_ENUMS[NUM_SHADER_TYPES] = {GL_VERTEX_SHADER, GL_FRAGMENT_SHADER};
+
+//----- Locally used functions
+
+static GLenum
+get_shader_type_enum(ShaderType type) {
+	return SHADER_TYPE_ENUMS[type];
+}
+
+
+/*
+  Returns a pointer to a char (a string)
+  allocated on the heap containing the contents of the file specified with filename
+ */
 
 char *
-readFileContents(const char* filename) {
+read_shader_source(const char* filename) {
 	FILE *input = fopen(filename, "rb");
 	long size;
 	char *content;
@@ -31,107 +49,138 @@ readFileContents(const char* filename) {
 }
 
 char *
-getTypeString(GLenum shaderType) {
-	char *strShaderType = NULL;
-	switch(shaderType) {
-	case GL_VERTEX_SHADER: strShaderType = "vertex"; break;
-//	case GL_GEOMETRY_SHADER: strShaderType = "geometry"; break;
-	case GL_FRAGMENT_SHADER: strShaderType = "fragment"; break;
-	}
-	return (strShaderType);
+get_shader_type_string(ShaderType type) {
+	return SHADER_TYPE_STRINGS[type];
 }
 
-shader_t *
-createShader(GLenum shaderType, const GLchar *source) {
-	GLuint handle;
-
+void
+init_shader(Shader *s, ShaderType type, const char *source) {
 	GLint status;
-	GLint infoLogLength;
-	GLchar *infoLog;
-	
-	shader_t *shader;
-
-	handle = glCreateShader(shaderType);
+	unsigned int handle;
+	handle = (unsigned int) glCreateShader(get_shader_type_enum(type));
 
 	glShaderSource(handle, 1, &source, NULL);
 	glCompileShader(handle);
+	
 
 	glGetShaderiv(handle, GL_COMPILE_STATUS, &status);
 
 	if (status == GL_FALSE) {
+		char *infoLog;
+		char *strType;
+		GLint infoLogLength;
+
 		printf("Unable to compile shader!\n");
 		glGetShaderiv(handle, GL_INFO_LOG_LENGTH, &infoLogLength);
-
-		infoLog = malloc(sizeof(GLchar) * (infoLogLength + 1));
+		
+		/* Get the log */
+		infoLog = (char *) malloc(sizeof(GLchar) * (infoLogLength + 1));
 		glGetShaderInfoLog(handle, infoLogLength, NULL, infoLog);
-		printf("Error in %s shader: %s\n", getTypeString(shaderType), infoLog);
+		/* Get the type of the shader (vertex, fragment) */
+		strType = get_shader_type_string(type);
+		printf("Error in %s shader: %s\n", strType, infoLog);
+
+		/* strType is in the data segment, but infolog is on the heap */
 		free(infoLog);
+
+		/* Core dump because compile failed */
+		assert(0);
 	}
-
-	shader = malloc(sizeof(shader_t));
-	(*shader).handle = handle;
-	(*shader).shaderType = shaderType;
-	return (shader);
+	s->handle = handle;
+	s->type = type;
 }
-program_t *
-createProgram(shader_t *vs, shader_t *fs) {
-	program_t *program;
-	GLuint programID;
-
-	programID = glCreateProgram();
+void
+init_shader_from_file(Shader *s, ShaderType type, const char *fileName) {
+	char *source = read_shader_source(fileName);
 	
-	glAttachShader(programID, (*vs).handle);
-	glAttachShader(programID, (*fs).handle);
+	init_shader(s, type, source);
+	
+	free(source);
+}
+void
+init_program(Program *p, Shader *vs, Shader *fs) {
+	GLuint handle = glCreateProgram();
+	
+	glAttachShader(handle, (*vs).handle);
+	glAttachShader(handle, (*fs).handle);
 
 	/* Link the program */
-	glLinkProgram(programID);
+	glLinkProgram(handle);
 	
-	program = malloc(sizeof(program_t));
-	(*program).handle = programID;
-	(*program).vertexShader = vs;
-	(*program).fragmentShader = fs;
-	return (program);
+	p->handle = handle;
+	p->vertexShader = vs;
+	p->fragmentShader = fs;
 }
 
-shader_t *
-createShaderFromFile(GLenum shaderType, const char *filename) {
-	const char *source = readFileContents(filename);
-	return (createShader(shaderType, source));
+
+void
+init_uniform(Uniform *u, Program *p, ShaderVarType type, const char *name) {
+	GLint handle;
+	
+	handle = glGetUniformLocation(p->handle, name);
+	
+	u->handle = handle;
+	u->type = type;
+	u->name = name;
+}
+void
+init_attribute(Attribute *a, Program *p, ShaderVarType type, const char *name) {
+	GLint handle;
+
+	handle = glGetAttribLocation(p->handle, name);
+	a->handle = handle;
+	a->type = type;
+	a->name = name;
 }
 
 void
-deleteShader(shader_t *shader) {
-	shader_t s = *shader;
-	glDeleteShader(s.handle);
-	free(shader);
+clear_attribute(Attribute *a) {
+	a->handle = -1;
+	a->type = INVALID_SHADER_VAR_TYPE;
+	a->name = NULL;
+}
+
+void
+clear_uniform(Uniform *u) {
+	u->handle = -1;
+	u->type = INVALID_SHADER_VAR_TYPE;
+	u->name = NULL;
+}
+
+void
+destroy_shader(Shader *s) {
+	glDeleteShader(s->handle);
+	s->handle = 0;
+	s->type = INVALID_SHADER_TYPE;
 }
 void
-deleteProgram(program_t *program) {
-	glDeleteProgram(program->handle);
-	free(program);
+destroy_program(Program *p) {
+	//Detach shaders
+	glDetachShader(p->handle, p->vertexShader->handle);
+	glDetachShader(p->handle, p->fragmentShader->handle);
+	//Delete the program
+	glDeleteProgram(p->handle);
+	p->handle = 0;
+	p->vertexShader = NULL;
+	p->fragmentShader = NULL;
 }
 
-uniform_t *
-getUniform(program_t *program, const char *name) {
-	GLint handle;
-	uniform_t *uniform;
-
-	handle = glGetUniformLocation((*program).handle, name);
-	
-	uniform = malloc(sizeof(uniform_t));
-	(*uniform).location = handle;
-	(*uniform).name = name;
-	return (uniform);
+void
+use_program(Program *p) {
+	glUseProgram(p->handle);
+}
+void
+unbind_current_program() {
+	glUseProgram(0);
 }
 
-attribute_t *
-getAttribute(program_t *program, const char *name) {
-	GLint handle;
-	attribute_t *attribute;
-	
-	handle = glGetAttribLocation((*program).handle, name);
-	attribute = malloc(sizeof(attribute_t));
-	(*attribute).location = handle;
-	(*attribute).name = name;
-	return (attribute);
+void
+set_uniform_vec3(Uniform *u, float x, float y, float z) {
+	assert(u->type == VEC3);
+	glUniform3f(u->handle, x, y, z);
+}
+void
+set_uniform_vec4(Uniform *u, float x, float y, float z, float w) {
+	assert(u->type == VEC4);
+	glUniform4f(u->handle, x, y, z, w);
 }
