@@ -100,7 +100,7 @@ read_png(const char *filename, int *width, int *height, ImageFormat *format) {
 
     fp = fopen(filename, "rb");
     if (fp == 0) {
-		printf("Error opening file: %s", filename);
+		printf("Error opening file: %s\n", filename);
 		assert(0);
     }
     /* read the header */
