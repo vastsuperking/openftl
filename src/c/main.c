@@ -3,9 +3,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <glload/gl_2_0.h>
 
 static Texture *wood;
+static Texture *spaceship;
 
 
 
@@ -13,28 +13,31 @@ static Texture *wood;
 void
 init_texture_png_resource(Texture *t, char *resource) {
 	char *prefix = "../resources/";
-	char new[strlen(resource) + strlen(prefix) + 1];
+	char result[strlen(resource) + strlen(prefix) + 1];
 	//Clear the string
-	new[0] = '\0';
+	result[0] = '\0';
 
-	strcat(new, prefix);
-	strcat(new, resource);
+	strcat(result, prefix);
+	strcat(result, resource);
 
-	init_texture_png(t, new);
+	init_texture_png(t, result);
 }
 
 /* Main functions */
 
 void
 init_textures() {
-	Texture *w = malloc(sizeof(Texture));
-	init_texture_png_resource(w, "wood_test.png");
-	wood = w;
+	wood = malloc(sizeof(Texture));
+	spaceship = malloc(sizeof(Texture));
+
+	init_texture_png_resource(wood, "wood_test.png");
+	init_texture_png_resource(spaceship, "ships/blueship1.png");
 }
 void
 cleanup_textures() {
 	destroy_texture(wood);
 	free(wood);
+	free(spaceship);
 }
 
 
@@ -44,12 +47,14 @@ render_scene() {
 	
 	ready_for_rendering();
 	
-	set_color(1, 0, 0, 1);
+	/*set_color(1, 0, 0, 1);*/
 	set_texture(wood);
 
 	render_quad(-1, -1, 2, 2);
 
-	
+	set_texture(spaceship);
+
+	render_quad(-0.5, -1, 1, 2);
 
 	finish_rendering();
 	swap_buffers();

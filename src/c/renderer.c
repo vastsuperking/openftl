@@ -38,7 +38,6 @@ init_display(int width, int height, char *name) {
 	glutInit(&argc, myargv);
 
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
-	//glutInitContextVersion(MAJOR_CONTEXT_VERSION, MINOR_CONTEXT_VERSION);
 
 	glutInitWindowPosition(100, 100);
 	glutInitWindowSize(width, height);
