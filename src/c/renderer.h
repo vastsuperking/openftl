@@ -1,5 +1,6 @@
 #ifndef RENDERER_H
 #define RENDERER_H
+#include "texture.h"
 
 void init_display(int width, int height, char *name);
 void init_OGL();
@@ -15,6 +16,7 @@ void ready_for_rendering();
 void finish_rendering();
 
 void set_color(float r, float g, float b, float a);
+void set_texture(Texture *t);
 
 void render_quad(float x, float y, float width, float height);
 

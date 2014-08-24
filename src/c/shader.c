@@ -119,6 +119,11 @@ init_uniform(Uniform *u, Program *p, ShaderVarType type, const char *name) {
 	
 	handle = glGetUniformLocation(p->handle, name);
 	
+	if (handle == -1) {
+		printf("Error: Could not find uniform: %s\n", name);
+		assert(0);
+	}
+
 	u->handle = handle;
 	u->type = type;
 	u->name = name;
@@ -128,6 +133,12 @@ init_attribute(Attribute *a, Program *p, ShaderVarType type, const char *name) {
 	GLint handle;
 
 	handle = glGetAttribLocation(p->handle, name);
+
+	if (handle == -1) {
+		printf("Error: Could not find attribute: %s\n", name);
+		assert(0);
+	}
+
 	a->handle = handle;
 	a->type = type;
 	a->name = name;
@@ -175,12 +186,18 @@ unbind_current_program() {
 }
 
 void
+set_uniform_float(Uniform *u, float val) {
+	assert(u->type == SVAR_INT || u->type == SVAR_SAMPLER2D);
+	glUniform1f(u->handle, val);
+}
+
+void
 set_uniform_vec3(Uniform *u, float x, float y, float z) {
-	assert(u->type == VEC3);
+	assert(u->type == SVAR_VEC3);
 	glUniform3f(u->handle, x, y, z);
 }
 void
 set_uniform_vec4(Uniform *u, float x, float y, float z, float w) {
-	assert(u->type == VEC4);
+	assert(u->type == SVAR_VEC4);
 	glUniform4f(u->handle, x, y, z, w);
 }

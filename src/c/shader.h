@@ -14,6 +14,7 @@ typedef enum {
 	SVAR_VEC2,
 	SVAR_VEC3,
 	SVAR_VEC4,
+	SVAR_SAMPLER2D,
 	INVALID_SHADER_VAR_TYPE
 } ShaderVarType;
 
@@ -59,6 +60,7 @@ void destroy_program(Program *p);
 void use_program(Program *p);
 void unbind_current_program();
 
+void set_uniform_float(Uniform *u, float val);
 void set_uniform_vec3(Uniform *u, float x, float y, float z);
 void set_uniform_vec4(Uniform *u, float x, float y, float z, float w);
 

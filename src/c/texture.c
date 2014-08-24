@@ -1,5 +1,4 @@
 #include "texture.h"
-#include "renderer.h"
 
 #include <stdlib.h>
 #include <assert.h>

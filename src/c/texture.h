@@ -2,7 +2,7 @@
 #define TEXtURE_H
 
 typedef enum {
-	TEX_FMT_RED,
+	TEX_FMT_RED = 0,
 	TEX_FMT_RGB,
 	TEX_FMT_RGBA,
 	NUM_TEXTURE_FORMATS,
