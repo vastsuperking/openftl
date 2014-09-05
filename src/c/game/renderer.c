@@ -7,6 +7,8 @@
 #include <GL/freeglut.h>
 #include <stdio.h>
 
+static const char *FRAGMENT_SHADER_LOC = "../../glsl/fragment.frag";
+static const char *VERTEX_SHADER_LOC = "../../glsl/vertex.vert";
 
 static Shader *fragShader;
 static Shader *vertexShader;
@@ -18,7 +20,7 @@ static Attribute *texCoordAttrib;
 static Uniform *diffuseSamplerUni;
 static Uniform *colorUni;
 
-//Temporary values, will move to vec4 or color struct
+/*Temporary values, will move to vec4 or color struct*/
 static float colorRed;
 static float colorBlue;
 static float colorGreen;
@@ -27,6 +29,15 @@ static float colorAlpha;
 static Texture *currentTexture;
 
 static Texture *whiteTexture;
+
+static void (*renderFunction)();
+
+/* Will call render function and then glutPosRedisplay() */
+static void
+do_glut_display() {
+	if (renderFunction) renderFunction();
+	glutPostRedisplay();
+}
 
 void
 init_display(int width, int height, char *name) {
@@ -38,6 +49,7 @@ init_display(int width, int height, char *name) {
 	glutInit(&argc, myargv);
 
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
+	
 
 	glutInitWindowPosition(100, 100);
 	glutInitWindowSize(width, height);
@@ -48,6 +60,8 @@ init_display(int width, int height, char *name) {
 		printf("Loading opengl function pointers failed!");
 		assert(0);
 	}
+
+	glutDisplayFunc(do_glut_display);
 }
 
 void
@@ -66,8 +80,8 @@ init_OGL() {
 	colorUni = malloc(sizeof(Uniform));
 	diffuseSamplerUni = malloc(sizeof(Uniform));
 
-	init_shader_from_file(fragShader, FRAGMENT_SHADER, "fragment.frag");
-	init_shader_from_file(vertexShader, VERTEX_SHADER, "vertex.vert");
+	init_shader_from_file(fragShader, FRAGMENT_SHADER, FRAGMENT_SHADER_LOC);
+	init_shader_from_file(vertexShader, VERTEX_SHADER, VERTEX_SHADER_LOC);
 	init_program(program, fragShader, vertexShader);
 	init_attribute(vertPosAttrib, program, SVAR_VEC2, "vertPos");
 	init_attribute(texCoordAttrib, program, SVAR_VEC2, "texCoord");
@@ -115,8 +129,16 @@ destroy_OGL() {
 }
 
 void
-set_render_function(void (*func)(void)) {
-	glutDisplayFunc(func);
+set_render_function(void (*render)()) {
+	renderFunction = render;
+}
+void
+set_keyboard_function(void (*keyboard)(unsigned char key, int mouseX, int mouseY)) {
+	glutKeyboardFunc(keyboard);
+}
+void
+set_special_key_function(void (*specialKeys)(int key, int mouseX, int mouseY)) {
+	glutSpecialFunc(specialKeys);
 }
 
 void

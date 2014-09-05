@@ -5,6 +5,8 @@
 void init_display(int width, int height, char *name);
 void init_OGL();
 void destroy_OGL();
+void set_keyboard_function(void (*keyboard)(unsigned char key, int mouseX, int mouseY));
+void set_special_key_function(void (*keyboard)(int key, int mouseX, int mouseY));
 void set_render_function(void (*func)(void));
 void start_main_loop();
 void clear_display();

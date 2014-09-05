@@ -1,0 +1,15 @@
+CC	= gcc-4.8
+CFLAGS	= -g -std=c11 -pedantic-errors -Wall -Wextra -Wno-unused-parameter -Wno-long-long -Wdeclaration-after-statement -Werror
+#CFLAGS	= -g -ansi -pedantic-errors -Wall -Wextra -Wno-unused-parameter -Wno-long-long -Werror
+LDFLAGS = -g
+
+
+INCLUDE_FLAGS = -I $(TOP)/libs/include
+LIBRARIES = -lglloadD -lGL -lglut -lpng -L $(TOP)/libs
+
+#SOURCES = $(shell find . -maxdepth 1 -name \*\.c -print0 | xargs -0 echo | sed 's/\.\///g')
+#OBJECTS = $(SOURCES:.c=.o)
+
+
+%.o : %.c
+	$(CC) -c $(CFLAGS) $(INCLUDE_FLAGS) -o $@ $< 

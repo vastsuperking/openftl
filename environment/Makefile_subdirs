@@ -1,0 +1,16 @@
+# -*-Makefile-*----------------------------------------------------------------
+
+#SUBDIRS := $(shell echo *\\/ | sed 's/\///g')
+
+all:		TARGET := all
+clean:		TARGET := clean
+
+
+%.o:	$(SUBDIRS)
+all:	$(SUBDIRS)
+clean:	$(SUBDIRS)
+
+.PHONY:	$(SUBDIRS)
+
+$(SUBDIRS):
+	@$(MAKE) -C $@ $(TARGET)

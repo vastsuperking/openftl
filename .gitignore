@@ -1,4 +1,6 @@
 *.o
 *.~
+*~
 src/c/openftl
 src/c/vectortest
+src/resources
