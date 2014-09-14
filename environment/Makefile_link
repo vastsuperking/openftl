@@ -1,0 +1,19 @@
+CC = gcc-4.8
+
+LINK_FLAGS = -lglloadD -lGL -lglut -lpng -L../../libs
+#LINK_FLAGS = -L../../libs -L/usr/lib/x86_64-linux-gnu -lGL -lglut -lglloadD
+
+
+ALL_SOURCES = $(shell find . -name \*\.c -print0 | xargs -0 echo | sed 's/\.\///g')
+ALL_OBJECTS = $(ALL_SOURCES:.c=.o)
+
+EXECS = openftl
+
+
+#CC must be set in makefile this is included from
+
+$(EXECS): $(ALL_OBJECTS)
+	$(CC) -o $@ $(ALL_OBJECTS) $(LINK_FLAGS)
+clean_execs:
+	rm -f $(EXECS)
+clean: clean_execs

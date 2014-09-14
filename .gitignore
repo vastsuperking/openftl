@@ -1,3 +1,6 @@
-src/resources/Data
 *.o
+*.~
+*~
 src/c/openftl
+src/c/vectortest
+src/resources
