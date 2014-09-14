@@ -5,7 +5,7 @@ LDFLAGS = -g
 
 
 INCLUDE_FLAGS = -I $(TOP)/libs/include
-LIBRARIES = -lglloadD -lGL -lglut -lpng -L $(TOP)/libs
+LIBRARIES = -lglloadD -lGL -lglut -lpng -lm -L $(TOP)/libs
 
 #SOURCES = $(shell find . -maxdepth 1 -name \*\.c -print0 | xargs -0 echo | sed 's/\.\///g')
 #OBJECTS = $(SOURCES:.c=.o)
